@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Friendship Network</title>
+</head>
+<body>
+    <div id="cy"></div>
+    <div class="options-container">
+        <h1>FRIENDSHIP NETWORK</h1>
+
+        <h2>Enter your friends' names:</h2>
+
+        <input type="text" id="addFriendInput" name="name" placeholder="Name...">
+        <input type="button" value="Add Friend" onclick="addFriend()">
+
+        <p>Click "Add Friend" to add the name to the list.</p>
+
+        <ul id="friendList">
+        </ul>
+
+        <h2>Enter your friends' connections:</h2>
+
+        <select name="vertex1" id="vertex1Input">
+            
+        </select>
+        <!-- <input type="text" id="vertex1Input" name="name" placeholder="Friend's Name"> -->
+        <select name="vertex2" id="vertex2Input">
+        
+        </select>
+        <input type="number" id="edgeWeight" name="weight" placeholder="Connection weight">
+        <input type="button" value="Add Connection" onclick="addConnection()">
+        
+        
+        <p>Click "Add Connection" to add the connection to the graph.</p>
+
+        <ul id="connectionList">
+        </ul>
+        
+        <div id="description-container">
+            <p id="totalFriendshipsLabel">Total Number of Friendships: </p>
+            <p id="mostPopularLabel">Most Popular Person: </p>
+            <p id="isolatedIndividualsLabel">Isolated Individuals: </p>
+            <p id="averageFriendshipLabel">Average Friendship Strength: </p>
+        </div>
+    </div>
+</body>
+<script src="https://unpkg.com/cytoscape/dist/cytoscape.min.js"></script>
+<script src="script.js"></script>
+</html>

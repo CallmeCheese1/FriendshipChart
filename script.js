@@ -86,8 +86,21 @@ function updateLists()
 
         let item = document.createElement('li');
         item.appendChild(document.createTextNode(vertices[i]));
+        item.id = vertices[i];
+        let deleteButton = document.createElement("button");
+
+        //Add a button to call the function to delete the vertex within the graph and the array, and visually self-destruct this item.
+        deleteButton.addEventListener("click", function() {
+          removeFriend(item.id)
+          item.remove()
+        })
+
+        deleteButton.innerHTML = "Delete"
+        item.appendChild(deleteButton)
+        
         friendList.appendChild(item);
 
+        //Adds every friend vertex as a possible selection in the options for vertex1 and vertex2 for creating a connection.
         let friend = document.createElement('option');
         friend.appendChild(document.createTextNode(vertices[i]));
         friend.value = vertices[i]
@@ -103,6 +116,20 @@ function updateLists()
     for (let i = 0; i < edges.length; i++) {
         let item = document.createElement('li');
         item.appendChild(document.createTextNode(edges[i].startVertex + " --( " + edges[i].weight + " )-> " + edges[i].endVertex));
+
+        //Format for edge ID's: 'startVertex--endVertex'
+        item.id = edges[i].startVertex + "--" + edges[i].endVertex
+        let deleteButton = document.createElement("button");
+
+        //Add a button to call the function to delete the edge within the graph and the array, and visually self-destruct this item.
+        deleteButton.addEventListener("click", function() {
+          removeConnection(edges[i].startVertex, edges[i].endVertex, edges[i].weight)
+          item.remove()
+        })
+
+        deleteButton.innerHTML = "Delete"
+        item.appendChild(deleteButton)
+
         connectionList.appendChild(item);
     }
 
@@ -114,6 +141,7 @@ function updateLists()
     //Create an array of every node and their degrees
     //NOTE! To select a specific node, matched by their id, do cy.$id(vertices[i]). To get a certain node's degree, do cy.$id(vertices[i]).degree(false). True or false dictates if you should count edges that go back to the same node.
 
+    console.log("Creating the degrees vertices!")
     degrees = [];
     for (const vertex of vertices)
     {
@@ -132,8 +160,18 @@ function updateLists()
       }
     }
 
-    console.log("The node with the highest degree is " + degrees[maxIndex][0] + ", with a degree of " + degrees[maxIndex][1])
+    if (degrees.length == 0) {
+      console.log("There's nothing in the degrees array.")
 
+      mostPopularLabel.innerHTML = "Most Popular Person: "
+      isolatedVLabel.innerHTML = "Isolated Individuals: None!"
+      averageFriendshipLabel.innerHTML = "Average Friendship Strength: "
+
+
+      return
+    }
+
+    console.log("Setting the most popular person!")
     mostPopularLabel.innerHTML = "Most Popular Person: " + degrees[maxIndex][0]
 
     
@@ -183,9 +221,7 @@ function updateLists()
       totalEdgeWeight += Number(edges[i].weight)
     }
 
-    console.log(totalEdgeWeight)
-    console.log(edges.length)
-
+    console.log("Setting the average friendship!")
     averageFriendshipLabel.innerHTML = "Average Friendship Strength: " + (totalEdgeWeight / edges.length);
 }
 
@@ -201,13 +237,38 @@ function addFriend() {
         data: { 
             id: addFriendInput.value,
         },
-        position: { x: getRandomInt(200), y: getRandomInt(200) }
+        position: { x: getRandomInt(300), y: getRandomInt(400) }
     })
 
     console.log(vertices);
     addFriendInput.value = "";
     updateLists();
   }
+}
+
+//Remove this friend from the vertices array, and from the graph. 
+function removeFriend(friendName)
+{
+  //Deletes them from the vertices array
+  console.log("Removing " + friendName + "from the original vertices array.")
+  vertices.splice(vertices.indexOf(friendName), 1)
+  console.log(vertices)
+
+  //Delete them visually from the graph.
+  cy.remove(cy.$('#' + friendName))
+
+  //We also need to delete every Edge that contains this vertice within our edges array.
+
+  for (const edge of edges)
+  {
+    if (edge.startVertex == friendName || edge.endVertex == friendName)
+    {
+      edges.splice(edges.indexOf(edge), 1)
+    }
+  }
+
+  updateLists();
+
 }
 
 function addConnection() {
@@ -239,3 +300,18 @@ function addConnection() {
   }
 }
 
+//Removes a connection from the edges array and from the graph.
+function removeConnection(start, end, weight) {
+  exiledEdge = new Edge(start, end, weight)
+  id = start + "--" + end
+
+  console.log("Removing " + id + "from the original edges array.")
+  edges.splice(edges.indexOf(exiledEdge), 1)
+  console.log(edges)
+
+  //Delete them visually from the graph.
+  cy.remove(cy.$('#' + id))
+
+  updateLists();
+
+}
